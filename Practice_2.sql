@@ -349,9 +349,8 @@ SELECT student_name FROM stud;
 
 -- UNION ALL: This gives the duplicates
 SELECT student_name FROM stud
-UNION 
+UNION ALL
 SELECT student_name FROM stud;
--- In this case we are not having any of these names in other tables so we will not get any duplicate values.
 
 /*----------------------------------------------SQL SUBQUERIES------------------------------------------------------------*/
 /*Also known as INNER query or NESTED query.
