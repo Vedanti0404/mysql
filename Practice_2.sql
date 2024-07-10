@@ -57,8 +57,8 @@ VALUES
 (1, 'Aarav', 20, 'M', 85, 'Mumbai', NULL, NULL),
 (2, 'Isha', 21, 'F', 90, 'Delhi', 'Bob', 101),
 (3, 'Raj', 22, 'M', 75, 'Ahmedabad', 'Jack', 102),
-(4, 'Nidhi', 23, 'F', 88, 'Bangalore', 'Donald', 103),
-(5, 'Vikram', 21, 'M', 92, 'Chennai', 'Bob',101),
+(4, 'Nidhi', 23, 'F', 88, 'Delhi', 'Donald', 103),
+(5, 'Vikram', 21, 'M', 92, 'Delhi', 'Bob',101),
 (6, 'Abhi', 19, 'M', 80, 'Pune', 'John', 104);
 
 /*-----------------------------------------------------------------------------------------------------------------------------*/
@@ -100,18 +100,18 @@ SELECT Gender, COUNT(*)
 FROM stud 
 GROUP BY Gender;
 /*-------------------------------------------------GROUP BY----------------------------------------------------------------------------*/
-SELECT Gender
+SELECT Gender, COUNT(*)
 FROM stud
 WHERE Marks > 70
 GROUP BY Gender
-HAVING COUNT(*) > 0
-ORDER BY Gender ASC;
+HAVING COUNT(*) > 2
+ORDER BY Gender DESC;
 /*-----------------------------------------------------------------UPDATE----------------------------------------------------------------------------*/
 SET SQL_SAFE_UPDATES=0; -- This query is for changing safe mode. '0' means off
 
 UPDATE stud
 SET Marks = 95
-WHERE Roll_number = 2;
+WHERE Roll_number = 2; -- USE PRIMARY KEY ONLY
 SELECT * FROM stud;
 
 UPDATE stud
@@ -124,7 +124,7 @@ WHERE Marks < 90;
 SELECT * FROM stud;
 /*------------------------------------------------------ALTER COMMAND---------------------------------------------------------------------*/
 /*ALTER COMMAND :  It is used to change the SCHEMA (Schema means the design of the table means, which columns are there, 
-what is the datatype of those columns and what constraints are there on thode columns.
+what is the datatype of those columns and what constraints are there on those columns.
 There are 3 operations in ALTER:
 1.ADD column
 2.DROP column
@@ -180,6 +180,7 @@ MODIFY COLUMN stud_age INT;
 SELECT * FROM stud;
 
 /*----------------------------------------------------------------TRUNCATE-------------------------------------------------------------------------*/
+-- deletes the values not the whole table.
 TRUNCATE TABLE stud;
 
 
@@ -328,13 +329,97 @@ FROM stud
 JOIN course
 ON stud.Roll_number = course.Roll_number;
 
+-- ---------------------------------------------------UNION--------------------------------------------------------------
+/*
+It is used to combine the result-set of two or more SELECT statements.
+Gives UNIQUE records.
+To use it :
+• every SELECT should have same no. of columns
+• columns must have similar data types
+• columns in every SELECT should be in same order
+
+SYNTAX:
+SELECT COLUMN(S) FROM table A
+UNION
+SELECT COLUMN(S) FROM table B*/
+
+SELECT student_name FROM stud
+UNION 
+SELECT student_name FROM stud;
+
+-- UNION ALL: This gives the duplicates
+SELECT student_name FROM stud
+UNION 
+SELECT student_name FROM stud;
+-- In this case we are not having any of these names in other tables so we will not get any duplicate values.
+
+/*----------------------------------------------SQL SUBQUERIES------------------------------------------------------------*/
+/*Also known as INNER query or NESTED query.
+It is a query within another SQL query.It involves 2 selct statements.
+SYNTAX:
+SELECT COLUMNS
+FROM table name
+WHERE COLUMN NAME OPERATOR --(In place of operater we can use Between,In,>,<,etc)
+(SUBQUERY);
+
+There are 3 ways in which we can write the subquery;
+1. within SELECT statement
+2.within FROM statement
+3.within WHERE clause.(mostly used)*/
+
+SELECT AVG(marks)
+FROM stud;
+
+SELECT student_name, marks
+FROM stud
+WHERE marks > 85.0000;
+/*this is a static way of finding student who have more marks than the average in the table.
+But what if some student gets more marks and then we update thode marks in the table. It will sure change the average marks.
+Hence we need a dynamic way to solve such type of problem.*/
+
+SELECT student_name, marks
+FROM stud
+WHERE marks > (SELECT AVG(marks) FROM stud);
+-- this is dynamic . whenever some changes are made in the table it will automatically calculate according to the changes.
+
+-- Name and roll no of student whose roll no is even number
+SELECT Roll_number, Student_name
+FROM stud
+WHERE Roll_number IN (
+    SELECT Roll_number
+    FROM stud
+    WHERE Roll_number % 2 = 0
+);
+
+-- SUBQUERY using FROM
+
+-- Finding the maximum marks from delhi city
+SELECT MAX(marks)
+FROM(SELECT * FROM stud WHERE city='Delhi') AS temp; 
+-- whenever we write a subquery in FROM we need to write the alias.
+-- We can do this same thing in simple way too but this is the demonstration of how to use a subquery in From statement.
 
 
+-- SUBQUERY using SELECT( not frequently used)
+SELECT(SELECT MAX(marks) FROM stud ), Student_name
+FROM stud;
+-- this is not used frequently as it is ineffecient than other .
 
 
+/*--------------------------------------------------MySQL Views------------------------------------------------*/
+/*A view is a virtual table based on the result-set of an SQL statement.
+Imagine we have a big customer dataset in which we have various columns. If a company has this kind of data, then 
+suppose if there is a sales team and if that team gets the data of the credit card that the customer has used to make 
+the transaction then such kind of data is not necessary for the sales team or customer service team. It is important for accounts
+team to have the credit card data . In such cases we create views from the table. We take the smaller verison of that tabel
+and make a virtal or temporary view there is smaller data and on that view we run our queries.*/
 
-
-
+CREATE VIEW view1 AS
+SELECT Roll_number, Student_name, marks FROM stud;
+SELECT * FROM view1
+WHERE marks>90;
+DROP VIEW view1;
+-- Whatever operation we perform on table we can perform on view.Views will not affect our actual table 
 
 
 
